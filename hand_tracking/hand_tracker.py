@@ -7,6 +7,7 @@ class HandTracker:
         self.hands = self.mp_hands.Hands(
             min_detection_confidence=detection_confidence,
             min_tracking_confidence=tracking_confidence,
+            max_num_hands=1
         )
 
     def process(self, image):
