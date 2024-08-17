@@ -1,4 +1,5 @@
 import mediapipe as mp
+import numpy as np
 
 
 class HandTracker:
@@ -7,9 +8,21 @@ class HandTracker:
         self.hands = self.mp_hands.Hands(
             min_detection_confidence=detection_confidence,
             min_tracking_confidence=tracking_confidence,
-            max_num_hands=1
+            max_num_hands=1,
         )
 
     def process(self, image):
         # Process the image to detect hand landmarks
         return self.hands.process(image)
+
+    def get_landmark_coords(self, hand_landmarks, index):
+
+        coords = np.array(
+            [
+                hand_landmarks.landmark[index].x,
+                hand_landmarks.landmark[index].y,
+                hand_landmarks.landmark[index].z,
+            ]
+        )
+
+        return coords
