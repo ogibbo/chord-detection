@@ -39,15 +39,15 @@ def main():
 
                 ######### Add functionality to get training data #########
                 # Get the landmarks of the hand and save them as a 
-                hand_tensor = get_hand_tensor(hand_landmarks)
+                # hand_tensor = get_hand_tensor(hand_landmarks)
 
-                COLLECTED_DATA.append((hand_tensor, CHORD))
-                video_stream.wait_key(10)
-                print(len(COLLECTED_DATA))
-                if len(COLLECTED_DATA) == N:
-                    with open(f'data/tensors_{CHORD}.pkl', 'wb') as handle:
-                        pickle.dump(COLLECTED_DATA, handle)
-                    break
+                # COLLECTED_DATA.append((hand_tensor, CHORD))
+                # video_stream.wait_key(10)
+                # print(len(COLLECTED_DATA))
+                # if len(COLLECTED_DATA) == N:
+                #     with open(f'data/tensors_{CHORD}.pkl', 'wb') as handle:
+                #         pickle.dump(COLLECTED_DATA, handle)
+                #     break
 
 
         video_stream.show_frame("Hand Tracking", bgr_frame)
