@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import torch
 import pickle
+import sys
 
 from hand_tracking import (
     VideoStream,
@@ -9,6 +10,10 @@ from hand_tracking import (
     DrawingUtils,
 )
 from utils import get_hand_tensor
+from data import normalize_tensor
+
+sys.path.append('models')
+
 
 def main():
 
@@ -22,6 +27,11 @@ def main():
     video_stream = VideoStream(source=0)
     hand_tracker = HandTracker()
     drawing_utils = DrawingUtils()
+
+    # Read model from file
+    with open('models/saved_models/simple_model.pth', 'rb') as f:
+        model = torch.load(f)
+        model.eval()
 
 
     while video_stream.cap.isOpened():
@@ -49,6 +59,18 @@ def main():
                 #         pickle.dump(COLLECTED_DATA, handle)
                 #     break
 
+                with torch.no_grad():
+
+                    hand_tensor = get_hand_tensor(hand_landmarks)
+                    hand_tensor = normalize_tensor(hand_tensor)
+
+                    flattened_tensor = hand_tensor.view(-1) 
+                    batch_tensor = flattened_tensor.unsqueeze(0)
+
+                    output = model(batch_tensor)
+                    predicted_class = torch.argmax(output, dim=1)
+
+                    print(predicted_class)
 
         video_stream.show_frame("Hand Tracking", bgr_frame)
         

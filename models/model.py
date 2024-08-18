@@ -1,5 +1,6 @@
 import copy
 from pytorch_lightning import Trainer
+import torch
 
 from chord_dataset import CustomChordDataset, DatasetType
 from simple_model import SimpleModel
@@ -22,6 +23,8 @@ if __name__ == "__main__":
     trainer.fit(model)
     # Test on the Test SET, it will print validation
     trainer.test()
+
+    torch.save(model, 'models/saved_models/simple_model.pth')
 
     
 
