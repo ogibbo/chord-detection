@@ -35,8 +35,14 @@ if __name__ == "__main__":
     combined_data = combine_pkl_files('raw_data/')
     
     print(f"Total number of tuples: {len(combined_data)}")
+
+    # encoding the labels
+    chord_labels = {'A':0,
+                    'C':1,
+                    'D':2,
+                    'G':3,}
     
-    normalized_dataset = [(normalize_tensor(tensor), label) for tensor, label in combined_data]
+    normalized_dataset = [(normalize_tensor(tensor), chord_labels[label]) for tensor, label in combined_data]
 
     # Save the normalized dataset
     with open('processed_data/all_data.pkl', 'wb') as f:

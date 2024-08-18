@@ -5,6 +5,7 @@ __pycache__/
 
 # Specific folders
 data/*/*.pkl
+lightning_logs/
 
 # C extensions
 *.so

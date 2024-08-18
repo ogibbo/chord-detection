@@ -1,15 +1,28 @@
-import torch
-import torch.nn as nn
+import copy
+from pytorch_lightning import Trainer
 
-class Model(nn.Module):
-    def __init__(self):
-        super(Model, self).__init__()
-        self.fc1 = nn.Linear(100, 50)  # Example layer
-        self.fc2 = nn.Linear(50, 10)   # Example layer
-        self.fc3 = nn.Linear(10, 4)    # Example output layer for 4 classes
+from chord_dataset import CustomChordDataset, DatasetType
+from simple_model import SimpleModel
 
-    def forward(self, x):
-        x = torch.relu(self.fc1(x))
-        x = torch.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x
+
+if __name__ == "__main__":
+    dataset = CustomChordDataset()
+
+    train=copy.deepcopy(dataset).set_fold(DatasetType.TRAIN)
+    test=copy.deepcopy(dataset).set_fold(DatasetType.TEST)
+    val=copy.deepcopy(dataset).set_fold(DatasetType.VAL)
+
+    # Start the Trainer
+    trainer = Trainer(
+        max_epochs=10,
+    )
+    # Define the Model
+    model=SimpleModel(train,test,val)
+    # Train the Model
+    trainer.fit(model)
+    # Test on the Test SET, it will print validation
+    trainer.test()
+
+    
+
+            
