@@ -4,80 +4,87 @@ import torch
 import pickle
 import sys
 
-from hand_tracking import (
-    VideoStream,
-    HandTracker,
-    DrawingUtils,
-)
+from hand_tracking import VideoStream, HandTracker, DrawingUtils
 from utils import get_hand_tensor, load_existing_model
 from data import normalize_tensor
 
 sys.path.append("models")
 
 
-def main():
+class ChordDetection:
+    def __init__(
+        self, model_fp, source=0, chord="C", collect_data=False, num_samples=1000
+    ):
+        self.chord = chord
+        self.collect_data = collect_data
+        self.num_samples = num_samples
+        self.collected_data = []
 
-    # To do: Figure out better way to handle this
-    GET_TRAINING_DATA = True
-    CHORD = "C"
-    COLLECTED_DATA = []
-    N = 1000
+        self.video_stream = VideoStream(source=source)
+        self.hand_tracker = HandTracker()
+        self.drawing_utils = DrawingUtils()
+        self.model = load_existing_model(model_fp)
 
-    # Initialising video stream, source may be different for you
-    video_stream = VideoStream(source=0)
-    hand_tracker = HandTracker()
-    drawing_utils = DrawingUtils()
+    def process_frame(self):
+        ret, frame = self.video_stream.read_frame(auto_preprocess=True)
+        results = self.hand_tracker.process(frame)
+        bgr_frame = self.video_stream.postprocess(frame)
 
-    # Read model from file
-    model_fp = "models/saved_models/simple_model.pth"
-
-    model = load_existing_model(model_fp)
-
-    while video_stream.cap.isOpened():
-
-        ret, frame = video_stream.read_frame(auto_preprocess=True)
-        results = hand_tracker.process(frame)
-        bgr_frame = video_stream.postprocess(frame)
-
-        # Draw the landmarks on the frame
         if results.multi_hand_landmarks:
             for num, hand_landmarks in enumerate(results.multi_hand_landmarks):
-                drawing_utils.draw_landmarks(
-                    bgr_frame, hand_landmarks, hand_tracker.mp_hands.HAND_CONNECTIONS
+                self.drawing_utils.draw_landmarks(
+                    bgr_frame,
+                    hand_landmarks,
+                    self.hand_tracker.mp_hands.HAND_CONNECTIONS,
                 )
 
-                ######### Add functionality to get training data #########
-                # Get the landmarks of the hand and save them as a
-                # hand_tensor = get_hand_tensor(hand_landmarks)
+                hand_tensor = get_hand_tensor(hand_landmarks)
 
-                # COLLECTED_DATA.append((hand_tensor, CHORD))
-                # video_stream.wait_key(10)
-                # print(len(COLLECTED_DATA))
-                # if len(COLLECTED_DATA) == N:
-                #     with open(f'data/tensors_{CHORD}.pkl', 'wb') as handle:
-                #         pickle.dump(COLLECTED_DATA, handle)
-                #     break
+                if self.collect_data:
+                    self.collect_training_data(hand_tensor)
+                else:
+                    self.classify_chord(hand_tensor)
 
-                with torch.no_grad():
+        return bgr_frame
 
-                    hand_tensor = get_hand_tensor(hand_landmarks)
-                    normalized_hand_tensor = normalize_tensor(hand_tensor)
+    def collect_training_data(self, hand_tensor):
+        self.collected_data.append((hand_tensor, self.chord))
+        print(f"Collected {len(self.collected_data)} samples")
 
-                    flattened_tensor = normalized_hand_tensor.view(-1)
-                    batch_tensor = flattened_tensor.unsqueeze(0)
+        if len(self.collected_data) >= self.num_samples:
+            self.save_training_data()
 
-                    output = model(batch_tensor)
-                    predicted_class = torch.argmax(output, dim=1)
+    def save_training_data(self):
+        with open(f"data/raw_data/tensors_{self.chord}.pkl", "wb") as handle:
+            pickle.dump(self.collected_data, handle)
+        print(
+            f"Saved {len(self.collected_data)} samples to data/tensors_{self.chord}.pkl"
+        )
+        self.video_stream.shut_down()
+        sys.exit()
 
-                    print(predicted_class)
+    def classify_chord(self, hand_tensor):
+        with torch.no_grad():
+            normalized_hand_tensor = normalize_tensor(hand_tensor)
+            flattened_tensor = normalized_hand_tensor.view(-1)
+            batch_tensor = flattened_tensor.unsqueeze(0)
 
-        video_stream.show_frame("Hand Tracking", bgr_frame)
+            output = self.model(batch_tensor)
+            predicted_class = torch.argmax(output, dim=1)
+            print(predicted_class)
 
-        if video_stream.wait_key(10) & 0xFF == ord("q"):
-            break
+    def run(self):
+        while self.video_stream.cap.isOpened():
+            bgr_frame = self.process_frame()
+            self.video_stream.show_frame("Hand Tracking", bgr_frame)
 
-    video_stream.shut_down()
+            if self.video_stream.wait_key(10) & 0xFF == ord("q"):
+                break
+
+        self.video_stream.shut_down()
 
 
 if __name__ == "__main__":
-    main()
+    model_fp = "models/saved_models/simple_model.pth"
+    classifier = ChordDetection(model_fp, collect_data=True)
+    classifier.run()

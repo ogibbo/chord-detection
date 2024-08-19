@@ -73,4 +73,3 @@ class SimpleModel(LightningModule):
 
     def test_dataloader(self):
         return DataLoader(self.test_ds, batch_size=BATCH_SIZE, shuffle=False)
-    
