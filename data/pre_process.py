@@ -42,6 +42,10 @@ def normalize_tensor(tensor):
     normalized_tensor = (tensor - mean) / (
         std + 1e-7
     )  # Adding epsilon to prevent division by zero
+
+    # changing origin to wrist
+    normalized_tensor = normalized_tensor - normalized_tensor[0]
+
     return normalized_tensor
 
 

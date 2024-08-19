@@ -21,7 +21,9 @@ class ChordDetection:
         self.video_stream = VideoStream(source=source)
         self.hand_tracker = HandTracker()
         self.drawing_utils = DrawingUtils()
-        self.model = load_existing_model(model_fp)
+
+        if not self.collect_data:
+            self.model = load_existing_model(model_fp)
 
     def process_frame(self):
         ret, frame = self.video_stream.read_frame(auto_preprocess=True)
