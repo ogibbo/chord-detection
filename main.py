@@ -4,14 +4,14 @@ import sys
 
 from hand_tracking import VideoStream, HandTracker, DrawingUtils
 from utils import get_hand_tensor, load_existing_model
-from data import normalize_tensor
+from data import normalize_tensor, CHORD_LABELS_R
 
 sys.path.append("models")
 
 
 class ChordDetection:
     def __init__(
-        self, model_fp, source=0, chord="C", collect_data=False, num_samples=1000
+        self, model_fp, source=0, chord=None, collect_data=False, num_samples=1000
     ):
         self.chord = chord
         self.collect_data = collect_data
@@ -39,6 +39,10 @@ class ChordDetection:
                 hand_tensor = get_hand_tensor(hand_landmarks)
 
                 if self.collect_data:
+
+                    if self.chord is None:
+                        raise ValueError("Please provide a chord to collect data for")
+
                     self.collect_training_data(hand_tensor)
                 else:
                     self.classify_chord(hand_tensor)
@@ -69,7 +73,8 @@ class ChordDetection:
 
             output = self.model(batch_tensor)
             predicted_class = torch.argmax(output, dim=1)
-            print(predicted_class)
+
+            print(f"Predicted Class: {CHORD_LABELS_R[predicted_class.item()]}")
 
     def run(self):
         while self.video_stream.cap.isOpened():
@@ -83,6 +88,6 @@ class ChordDetection:
 
 
 if __name__ == "__main__":
-    model_fp = "models/saved_models/simple_model.pth"
-    classifier = ChordDetection(model_fp, collect_data=True)
+    model_fp = "models/saved_models/model.pth"
+    classifier = ChordDetection(model_fp)
     classifier.run()

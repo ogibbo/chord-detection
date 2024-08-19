@@ -1,6 +1,15 @@
 import pickle
 import os
 
+CHORD_LABELS = {
+    "A": 0,
+    "C": 1,
+    "D": 2,
+    "G": 3,
+}
+
+CHORD_LABELS_R = {v: k for k, v in CHORD_LABELS.items()}
+
 
 def load_data_from_file(file_path):
     with open(file_path, "rb") as f:
@@ -41,16 +50,8 @@ if __name__ == "__main__":
 
     print(f"Total number of tuples: {len(combined_data)}")
 
-    # encoding the labels
-    chord_labels = {
-        "A": 0,
-        "C": 1,
-        "D": 2,
-        "G": 3,
-    }
-
     normalized_dataset = [
-        (normalize_tensor(tensor), chord_labels[label])
+        (normalize_tensor(tensor), CHORD_LABELS[label])
         for tensor, label in combined_data
     ]
 
