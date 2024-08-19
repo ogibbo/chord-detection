@@ -1,7 +1,5 @@
 import pickle
 import os
-import torch
-import numpy as np
 
 def load_data_from_file(file_path):
     with open(file_path, 'rb') as f:

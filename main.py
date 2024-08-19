@@ -9,10 +9,10 @@ from hand_tracking import (
     HandTracker,
     DrawingUtils,
 )
-from utils import get_hand_tensor
+from utils import get_hand_tensor, load_existing_model
 from data import normalize_tensor
 
-sys.path.append('models')
+sys.path.append("models")
 
 
 def main():
@@ -29,10 +29,9 @@ def main():
     drawing_utils = DrawingUtils()
 
     # Read model from file
-    with open('models/saved_models/simple_model.pth', 'rb') as f:
-        model = torch.load(f)
-        model.eval()
+    model_fp = "models/saved_models/simple_model.pth"
 
+    model = load_existing_model(model_fp)
 
     while video_stream.cap.isOpened():
 
@@ -48,7 +47,7 @@ def main():
                 )
 
                 ######### Add functionality to get training data #########
-                # Get the landmarks of the hand and save them as a 
+                # Get the landmarks of the hand and save them as a
                 # hand_tensor = get_hand_tensor(hand_landmarks)
 
                 # COLLECTED_DATA.append((hand_tensor, CHORD))
@@ -62,9 +61,9 @@ def main():
                 with torch.no_grad():
 
                     hand_tensor = get_hand_tensor(hand_landmarks)
-                    hand_tensor = normalize_tensor(hand_tensor)
+                    normalized_hand_tensor = normalize_tensor(hand_tensor)
 
-                    flattened_tensor = hand_tensor.view(-1) 
+                    flattened_tensor = normalized_hand_tensor.view(-1)
                     batch_tensor = flattened_tensor.unsqueeze(0)
 
                     output = model(batch_tensor)
@@ -73,7 +72,7 @@ def main():
                     print(predicted_class)
 
         video_stream.show_frame("Hand Tracking", bgr_frame)
-        
+
         if video_stream.wait_key(10) & 0xFF == ord("q"):
             break
 
