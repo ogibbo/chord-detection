@@ -22,6 +22,8 @@ class ChordDetection:
         self.hand_tracker = HandTracker()
         self.drawing_utils = DrawingUtils()
 
+        self.predicted_chord = None
+
         if not self.collect_data:
             self.model = load_existing_model(model_fp)
 
@@ -76,7 +78,10 @@ class ChordDetection:
             output = self.model(batch_tensor)
             predicted_class = torch.argmax(output, dim=1)
 
-            print(f"Predicted Class: {CHORD_LABELS_R[predicted_class.item()]}")
+            predicted_chord = CHORD_LABELS_R[predicted_class.item()]
+            self.predicted_chord = predicted_chord
+
+            print(f"Predicted Class: {predicted_chord}")
 
     def run(self):
         while self.video_stream.cap.isOpened():
