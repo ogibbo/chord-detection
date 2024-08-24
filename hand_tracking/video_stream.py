@@ -15,12 +15,10 @@ class VideoStream:
 
     def preprocess(self, frame):
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-        # Flip on horizontal
         frame = cv2.flip(frame, 1)
         return frame
 
     def postprocess(self, frame):
-        # Convert the RGB image back to BGR
         frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
         return frame
 

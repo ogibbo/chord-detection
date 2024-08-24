@@ -17,21 +17,18 @@ class CustomChordDataset(Dataset):
         with open(file_path, "rb") as f:
             self.data = pickle.load(f)
 
-        # Shuffle the list
         shuffle(self.data)
 
         train_split = 0.5
         val_split = 0.2
 
-        ## Calculate the indices for splitting
         train_end = int(
             train_split * len(self.data)
-        )  # Index where training data ends (50%)
+        )
         val_end = train_end + int(
             val_split * len(self.data)
-        )  # Index where validation data ends (50% + 20%)
+        )
 
-        # Use slicing to create lists instead of numpy arrays
         self.train_data = self.data[:train_end]
         self.val_data = self.data[train_end:val_end]
         self.test_data = self.data[val_end:]
@@ -51,7 +48,6 @@ class CustomChordDataset(Dataset):
         return self.data[index][0], self.data[index][1]
 
     def set_fold(self, set_type):
-        # Make sure to call this befor using the dataset
         if set_type == DatasetType.TRAIN:
             self.dataset, self.labels = self.train, self.train_labels
         if set_type == DatasetType.TEST:

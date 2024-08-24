@@ -12,7 +12,6 @@ class HandTracker:
         )
 
     def process(self, image):
-        # Process the image to detect hand landmarks
         return self.hands.process(image)
 
     def get_landmark_coords(self, hand_landmarks, index):

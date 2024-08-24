@@ -20,7 +20,6 @@ def load_data_from_file(file_path):
 def combine_pkl_files(data_dir="raw_data/"):
     combined_data = []
 
-    # Iterate over each file in the data directory
     for file_name in os.listdir(data_dir):
         if file_name.endswith(".pkl"):
             file_path = os.path.join(data_dir, file_name)
@@ -28,7 +27,7 @@ def combine_pkl_files(data_dir="raw_data/"):
             data = load_data_from_file(file_path)
             combined_data.extend(
                 data
-            )  # Add the data from this file to the combined list
+            )
 
     return combined_data
 
@@ -59,6 +58,5 @@ if __name__ == "__main__":
         for tensor, label in combined_data
     ]
 
-    # Save the normalized dataset
     with open("processed_data/all_data.pkl", "wb") as f:
         pickle.dump(normalized_dataset, f)

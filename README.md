@@ -1,14 +1,14 @@
-# Chord Detection
+# Visual Guitar Chord Detection
 
-Used hand-tracking techniques to train a neural network to detect the guitar chord a user is playing. As a beginner myself, I found it challenging to learn the basic chords, but once I learned them, practising became more enjoyable because I could learn new songs quicker. I thought an app like this could accelerate that process.
+Used hand-tracking techniques to train a neural network to detect the guitar chord a user is playing. As a beginner myself, I found it took a while to learn the basic chords, but once I learned them, practising became more enjoyable because I could learn new songs quicker. I thought an app like this could accelerate this initial process.
 
 ![demo](media/app.gif)
 
 ## Project Overview
 
-- **Hand Tracking:** Used Google’s MediaPipe computer vision framework to track hand movements and collect training data for chord detection.
-- **Model Training:** Trained a neural network using PyTorch with PyTorch Lightning to recognize different guitar chords based on hand positions.
-- **Deployment:** Packaged the model into a containerized Streamlit application for easy access and use - ready to be deployed in the cloud (once I figure out how the docker container can access the host's webcam)
+- **Hand Tracking:** Used Google’s MediaPipe computer vision framework to track hand movements and collect hand pose training data based on the chord being played.
+- **Model Training:** Trained a neural network using PyTorch with PyTorch Lightning to predict the chord being played in real time.
+- **Deployment:** Packaged the model into a containerized Streamlit application - ready to be deployed in the cloud (once I figure out how the docker container can access the host's webcam).
 
 ## Running the app
 
@@ -21,7 +21,7 @@ streamlit run app.py
 
 ## Collecting more data to train a new model
 
-For the demo I collected training data for a few chords, though only the trained model is included in this repo. If you want to include more chords you can run main.py and initialise ChordDetection with collect_data=True and chord={your chord}. Once you've done this for all the new chords, you can process the training data by running pre_process.py before training the model with training.py
+For the demo I collected training data for a few chords, though only the final trained model is included in this repo. If you want to include more chords you can run main.py and initialise ChordDetection with collect_data=True and chord={your chord}. Once you've done this for all the new chords, you can process the training data by running pre_process.py before training the model with training.py
 
 ## References
 

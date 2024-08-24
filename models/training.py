@@ -16,13 +16,9 @@ if __name__ == "__main__":
     test = copy.deepcopy(dataset).set_fold(DatasetType.TEST)
     val = copy.deepcopy(dataset).set_fold(DatasetType.VAL)
 
-    # Start the Trainer
     trainer = Trainer(max_epochs=10,)
-    # Define the Model
     model = Model(train, test, val, bsz=32, lr=1e-3, num_classes=len(CHORD_LABELS))
-    # Train the Model
     trainer.fit(model)
-    # Test on the Test SET, it will print validation
     trainer.test()
 
     torch.save(model, "models/saved_models/model.pth")
